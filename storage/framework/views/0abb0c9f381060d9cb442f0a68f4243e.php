@@ -11,8 +11,10 @@
     <!-- Header / Navbar Status Login & Logout -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 px-4 shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#">Admin Panel Fotokopi</a>
+            <a class="navbar-brand fw-bold text-warning" href="<?php echo e(route('admin.dashboard')); ?>">⚡ Admin Panel Fotokopi</a>
+            
             <div class="d-flex align-items-center gap-3 text-white">
+                <a href="<?php echo e(route('dashboard')); ?>" class="btn btn-outline-warning btn-sm">🏠 Mode Pelanggan</a>
                 <span class="small">Halo, <strong><?php echo e(Auth::user()->name ?? 'Admin'); ?></strong></span>
                 <form method="POST" action="<?php echo e(route('logout')); ?>" class="m-0">
                     <?php echo csrf_field(); ?>
@@ -23,15 +25,61 @@
     </nav>
 
     <div class="container pb-5">
+        
+        <!-- CARD RINGKASAN STATISTIK DASHBOARD -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 border-start border-primary border-4 p-3 bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fw-bold text-uppercase small">Total Pesanan</span>
+                            <h3 class="fw-bold mb-0 text-dark"><?php echo e(count($orders)); ?></h3>
+                        </div>
+                        <div class="fs-1">📦</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 border-start border-warning border-4 p-3 bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fw-bold text-uppercase small">Perlu Diproses</span>
+                            <h3 class="fw-bold mb-0 text-warning">
+                                <?php echo e($orders->whereIn('status', ['Dalam Antrean AI', 'Dalam Antrean'])->count()); ?>
+
+                            </h3>
+                        </div>
+                        <div class="fs-1">⏳</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 border-start border-success border-4 p-3 bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fw-bold text-uppercase small">Pesanan Selesai</span>
+                            <h3 class="fw-bold mb-0 text-success">
+                                <?php echo e($orders->where('status', 'Selesai')->count()); ?>
+
+                            </h3>
+                        </div>
+                        <div class="fs-1">✅</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <h2 class="mb-4 fw-bold">Jadwal Prioritas Pengerjaan</h2>
         
-        <?php if(session('success')): ?>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
             <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
                 <?php echo e(session('success')); ?>
 
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        <?php endif; ?>
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
         <!-- Area Tombol Aksi (Tambah, Export Excel & Export PDF) -->
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -57,40 +105,40 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $__empty_1 = true; $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                     <tr>
                         <td><span class="badge bg-danger fs-6">#<?php echo e($index + 1); ?></span></td>
                         <td class="text-start ps-3 fw-semibold"><?php echo e($order->customer_name); ?></td>
                         <td class="text-start ps-3"><?php echo e($order->total_pages); ?> hlm (<?php echo e($order->binding_type); ?>)</td>
                         
                         <td>
-                            <?php if($order->urgency_level >= 6): ?>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->urgency_level >= 6): ?>
                                 <span class="badge bg-danger">Sangat Urgent</span>
                             <?php elseif($order->urgency_level >= 3): ?>
                                 <span class="badge bg-warning text-dark">Penting</span>
                             <?php else: ?>
                                 <span class="badge bg-secondary">Biasa</span>
-                            <?php endif; ?>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </td>
 
                         <td>
-                            <?php if($order->estimated_duration_minutes <= 15): ?>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->estimated_duration_minutes <= 15): ?>
                                 <span class="badge bg-info text-dark">Cepat (<?php echo e($order->estimated_duration_minutes); ?> Mnt)</span>
                             <?php elseif($order->estimated_duration_minutes <= 45): ?>
                                 <span class="badge bg-primary">Sedang (<?php echo e($order->estimated_duration_minutes); ?> Mnt)</span>
                             <?php else: ?>
                                 <span class="badge bg-dark">Lama (<?php echo e($order->estimated_duration_minutes); ?> Mnt)</span>
-                            <?php endif; ?>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </td>
 
                         <td>
-                            <?php if($order->priority_score >= 60): ?>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->priority_score >= 60): ?>
                                 <span class="badge bg-secondary fs-6">Tinggi (<?php echo e($order->priority_score); ?>)</span>
                             <?php elseif($order->priority_score >= 30): ?>
                                 <span class="badge bg-secondary fs-6">Sedang (<?php echo e($order->priority_score); ?>)</span>
                             <?php else: ?>
                                 <span class="badge bg-secondary fs-6">Rendah (<?php echo e($order->priority_score); ?>)</span>
-                            <?php endif; ?>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </td>
 
                         <td style="width: 160px;">
@@ -113,11 +161,11 @@
                             </form>
                         </td>
                     </tr>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                     <tr>
                         <td colspan="8" class="text-muted py-4">Belum ada pesanan masuk.</td>
                     </tr>
-                    <?php endif; ?>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </tbody>
             </table>
         </div>

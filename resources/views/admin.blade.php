@@ -11,8 +11,10 @@
     <!-- Header / Navbar Status Login & Logout -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 px-4 shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#">Admin Panel Fotokopi</a>
+            <a class="navbar-brand fw-bold text-warning" href="{{ route('admin.dashboard') }}">⚡ Admin Panel Fotokopi</a>
+            
             <div class="d-flex align-items-center gap-3 text-white">
+                <a href="{{ route('dashboard') }}" class="btn btn-outline-warning btn-sm">🏠 Mode Pelanggan</a>
                 <span class="small">Halo, <strong>{{ Auth::user()->name ?? 'Admin' }}</strong></span>
                 <form method="POST" action="{{ route('logout') }}" class="m-0">
                     @csrf
@@ -23,6 +25,50 @@
     </nav>
 
     <div class="container pb-5">
+        
+        <!-- CARD RINGKASAN STATISTIK DASHBOARD -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 border-start border-primary border-4 p-3 bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fw-bold text-uppercase small">Total Pesanan</span>
+                            <h3 class="fw-bold mb-0 text-dark">{{ count($orders) }}</h3>
+                        </div>
+                        <div class="fs-1">📦</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 border-start border-warning border-4 p-3 bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fw-bold text-uppercase small">Perlu Diproses</span>
+                            <h3 class="fw-bold mb-0 text-warning">
+                                {{ $orders->whereIn('status', ['Dalam Antrean AI', 'Dalam Antrean'])->count() }}
+                            </h3>
+                        </div>
+                        <div class="fs-1">⏳</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 border-start border-success border-4 p-3 bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted fw-bold text-uppercase small">Pesanan Selesai</span>
+                            <h3 class="fw-bold mb-0 text-success">
+                                {{ $orders->where('status', 'Selesai')->count() }}
+                            </h3>
+                        </div>
+                        <div class="fs-1">✅</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <h2 class="mb-4 fw-bold">Jadwal Prioritas Pengerjaan</h2>
         
         @if(session('success'))
