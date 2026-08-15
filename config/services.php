@@ -35,11 +35,11 @@ return [
         ],
     ],
 
-    // Konfigurasi Google Socialite
+    // Konfigurasi Google Socialite (Disesuaikan dengan 127.0.0.1)
     'google' => [
-        'client_id' => env('GOOGLE_CLIENT_ID', 'dummy_client_id'),
-        'client_secret' => env('GOOGLE_CLIENT_SECRET', 'dummy_client_secret'),
-        'redirect' => 'http://localhost:8000/auth/google/callback',
+        'client_id'     => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect'      => env('GOOGLE_REDIRECT_URI', 'http://127.0.0.1:8000/auth/google/callback'),
     ],
 
 ];

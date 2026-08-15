@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    // 1. Tampilkan Form Pemesanan
+    // 1. Tampilkan Form Pemesanan (Read)
     public function index()
     {
         return view('order');
@@ -19,15 +19,20 @@ class OrderController extends Controller
     public function store(Request $request, FuzzyService $fuzzy)
     {
         $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'total_pages'   => 'required|numeric|min:1',
-            'binding_type'  => 'required|string',
-            'urgency_level' => 'required|numeric|min:1|max:10',
+            'customer_name'  => 'required|string|max:255',
+            'total_pages'    => 'required|numeric|min:1',
+            'copies'         => 'required|numeric|min:1',
+            'binding_type'   => 'required|string',
+            'urgency_level'  => 'required|numeric|min:1|max:10',
+            'payment_method' => 'required|string',
         ]);
 
-        // Kalkulasi via FuzzyService
+        // Total lembar keseluruhan yang dicetak (Total Halaman x Jumlah Copy)
+        $effectiveTotalPages = $request->total_pages * $request->copies;
+
+        // Kalkulasi via FuzzyService menggunakan total lembar cetak
         $calculation = $fuzzy->calculate(
-            $request->total_pages,
+            $effectiveTotalPages,
             $request->binding_type,
             $request->urgency_level
         );
@@ -37,8 +42,10 @@ class OrderController extends Controller
             'user_id'                    => Auth::id(),
             'customer_name'              => $request->customer_name,
             'total_pages'                => $request->total_pages,
+            'copies'                     => $request->copies,
             'binding_type'               => $request->binding_type,
             'urgency_level'              => $request->urgency_level,
+            'payment_method'             => $request->payment_method,
             'estimated_duration_minutes' => $calculation['duration'],
             'priority_score'             => $calculation['priority_score'],
             'status'                     => 'Dalam Antrean AI',
@@ -47,22 +54,18 @@ class OrderController extends Controller
         return redirect()->route('order.status', $order->id);
     }
 
-    // 3. Tampilkan Status Pesanan Pelanggan (Read)
+    // 3. Tampilkan Status Pesanan Pelanggan (Read - Fuzzy Priority + FIFO)
     public function status($id)
     {
         $order = Order::findOrFail($id);
+        $queueData = $this->calculateQueueTime($order);
 
-        // Hitung akumulasi menit antrean pesanan lain yang belum selesai
-        $queueMinutesBefore = Order::query()
-            ->where('status', '!=', 'Selesai')
-            ->where('priority_score', '>=', $order->priority_score)
-            ->where('id', '!=', $order->id)
-            ->where('created_at', '<=', $order->created_at)
-            ->sum('estimated_duration_minutes');
-
-        $totalWaitingMinutes = $queueMinutesBefore + $order->estimated_duration_minutes;
-
-        return view('status', compact('order', 'totalWaitingMinutes'));
+        return view('status', [
+            'order'               => $order,
+            'totalWaitingMinutes' => $queueData['totalWaitingMinutes'],
+            'estimatedFinishTime' => $queueData['estimatedFinishTime'],
+            'queueMinutesBefore'  => $queueData['queueMinutesBefore'],
+        ]);
     }
 
     // 4. Halaman Worklist Admin (Read)
@@ -72,6 +75,7 @@ class OrderController extends Controller
             return redirect()->route('order.form')->with('error', 'Akses ditolak! Anda bukan admin.');
         }
 
+        // Urutkan berdasarkan Skor Prioritas AI Terbesar, lalu Waktu Order (FIFO)
         $orders = Order::orderBy('priority_score', 'desc')
             ->orderBy('created_at', 'asc')
             ->get();
@@ -111,51 +115,60 @@ class OrderController extends Controller
         return redirect()->back()->with('success', 'Pesanan berhasil dihapus!');
     }
 
-    // 7. Download PDF Pesanan Pelanggan (Poin 5 UAS)
+    // 7. Download PDF / Cetak Nota Pesanan Pelanggan
     public function downloadPdf($id)
     {
         $order = Order::findOrFail($id);
-        
-        // Logika pembuatan PDF atau view struk cetak
-        return view('status', compact('order'))->with('totalWaitingMinutes', $order->estimated_duration_minutes);
+        $queueData = $this->calculateQueueTime($order);
+
+        return view('status', [
+            'order'               => $order,
+            'totalWaitingMinutes' => $queueData['totalWaitingMinutes'],
+            'estimatedFinishTime' => $queueData['estimatedFinishTime'],
+            'queueMinutesBefore'  => $queueData['queueMinutesBefore'],
+        ]);
     }
 
-    // 8. Export Excel Daftar Pesanan Admin (Poin 5 UAS)
+    // 8. Export Excel Daftar Pesanan Admin (CSV Output)
     public function exportExcel()
     {
         if (!Auth::check() || Auth::user()->role !== 'admin') {
             return redirect()->route('order.form')->with('error', 'Akses ditolak!');
         }
 
-        // Logika export excel sederhana atau download CSV
-        $orders = Order::all();
-        $fileName = 'Laporan_Pesanan_Admin.csv';
+        $orders = Order::orderBy('priority_score', 'desc')
+            ->orderBy('created_at', 'asc')
+            ->get();
 
-        $headers = array(
+        $fileName = 'Laporan_Pesanan_Admin_PunazaCopy.csv';
+
+        $headers = [
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
             "Pragma"              => "no-cache",
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
             "Expires"             => "0"
-        );
+        ];
 
-        $columns = array('ID', 'Nama Pemesan', 'Total Halaman', 'Jenis Jilid', 'Urgensi', 'Durasi (Mnt)', 'Skor Prioritas', 'Status');
+        $columns = ['ID', 'Nama Pemesan', 'Total Halaman', 'Jumlah Copy', 'Jenis Jilid', 'Urgensi', 'Metode Bayar', 'Durasi (Mnt)', 'Skor Prioritas', 'Status'];
 
-        $callback = function() use($orders, $columns) {
+        $callback = function() use ($orders, $columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
 
             foreach ($orders as $order) {
-                fputcsv($file, array(
+                fputcsv($file, [
                     $order->id, 
                     $order->customer_name, 
                     $order->total_pages, 
+                    $order->copies ?? 1,
                     $order->binding_type, 
                     $order->urgency_level, 
+                    $order->payment_method ?? 'Bayar di Kasir',
                     $order->estimated_duration_minutes, 
                     $order->priority_score, 
                     $order->status
-                ));
+                ]);
             }
 
             fclose($file);
@@ -164,14 +177,45 @@ class OrderController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-    // 9. Export PDF Laporan Pesanan Admin (Poin 5 UAS - TAMBAHAN)
+    // 9. Export PDF Laporan Pesanan Admin
     public function exportPdf()
     {
         if (!Auth::check() || Auth::user()->role !== 'admin') {
             return redirect()->route('order.form')->with('error', 'Akses ditolak!');
         }
 
-        $orders = Order::orderBy('priority_score', 'desc')->get();
+        $orders = Order::orderBy('priority_score', 'desc')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
         return view('admin_pdf', compact('orders'));
+    }
+
+    /**
+     * Helper privat untuk menghitung total durasi antrean dan estimasi jam selesai.
+     */
+    private function calculateQueueTime(Order $order): array
+    {
+        // Hitung akumulasi durasi pesanan lain yang belum selesai di depan pesanan ini
+        $queueMinutesBefore = Order::query()
+            ->where('status', '!=', 'Selesai')
+            ->where('id', '!=', $order->id)
+            ->where(function ($query) use ($order) {
+                $query->where('priority_score', '>', $order->priority_score)
+                      ->orWhere(function ($q) use ($order) {
+                          $q->where('priority_score', '=', $order->priority_score)
+                            ->where('created_at', '<', $order->created_at);
+                      });
+            })
+            ->sum('estimated_duration_minutes');
+
+        $totalWaitingMinutes = $queueMinutesBefore + $order->estimated_duration_minutes;
+        $estimatedFinishTime = $order->created_at->addMinutes($totalWaitingMinutes);
+
+        return [
+            'queueMinutesBefore'  => $queueMinutesBefore,
+            'totalWaitingMinutes' => $totalWaitingMinutes,
+            'estimatedFinishTime' => $estimatedFinishTime,
+        ];
     }
 }

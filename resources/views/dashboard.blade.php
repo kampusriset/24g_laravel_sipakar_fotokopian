@@ -1,158 +1,179 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard Pelanggan') }}
+        <h2 class="font-extrabold text-2xl text-slate-800 leading-tight flex items-center gap-2">
+            <span>📊</span> {{ __('Dashboard Pelanggan') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <!-- Custom Style Background & Glassmorphism -->
+    <style>
+        .dashboard-bg {
+            background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+            min-height: 100vh;
+        }
+
+        .glass-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(15, 23, 42, 0.1);
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
+        }
+
+        /* Tombol Buat Pesanan dipaksa Oranye Menyala & Teks Putih */
+        .btn-buat-pesanan {
+            background-color: #d97706 !important; /* Oranye Amber Pekat */
+            color: #ffffff !important;           /* Teks Putih Tebal */
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4) !important;
+        }
+
+        .btn-buat-pesanan:hover {
+            background-color: #b45309 !important; /* Warna Gelap Pas Hover */
+        }
+    </style>
+
+    <div class="py-8 dashboard-bg">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             
-            <!-- Banner Utama -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border-l-4 border-amber-500">
+            <!-- Banner Utama (Hero Card) -->
+            <div class="glass-box hero-banner p-6 border-l-8 border-amber-500 border-t border-r border-b border-amber-200">
                 <div class="md:flex md:items-center md:justify-between">
                     <div>
-                        <h3 class="text-2xl font-bold text-gray-900">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-900 text-xs font-bold mb-2 border border-amber-300">
+                            <span>⚡ PUNAZA COPY AI SYSTEM</span>
+                        </div>
+                        <h3 class="text-2xl font-extrabold text-slate-800 tracking-tight">
                             Papan Antrean & Status Pesanan 🖨️
                         </h3>
-                        <p class="text-gray-600 mt-1">
-                            Cek status pengerjaan dokumenmu secara real-time di bawah ini.
+                        <p class="text-slate-600 mt-1 text-sm">
+                            Cek perkiraan jam selesai dan status pengerjaan dokumenmu secara real-time.
                         </p>
                     </div>
                     <div class="mt-4 md:mt-0">
+                        <!-- TOMBOL BUAT PESANAN DENGAN WARNA TEGAS -->
                         <a href="{{ route('order.form') }}" 
-                           style="background-color: #f59e0b !important; color: #ffffff !important; display: inline-flex; align-items: center; padding: 12px 24px; font-weight: bold; border-radius: 8px; text-decoration: none;">
-                            🖨️ + Buat Pesanan Baru
+                           class="btn-buat-pesanan inline-flex items-center gap-2 font-extrabold py-3 px-6 rounded-xl transition transform hover:-translate-y-0.5 text-sm">
+                            <span>🖨️</span> + Buat Pesanan Baru
                         </a>
                     </div>
                 </div>
             </div>
 
             <!-- TABEL STATUS PELANGGAN -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100">
-                <h3 class="text-xl font-bold mb-4 text-gray-800">
-                    📋 Cek Status Pesanan
-                </h3>
+            <div class="glass-box p-6 border border-slate-300">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span>📋</span> Cek Status Pesanan
+                    </h3>
+                    <span class="text-xs font-semibold text-slate-600 bg-slate-200/80 px-3 py-1 rounded-full border border-slate-300">
+                        Diurutkan Berdasarkan Sistem Pakar AI
+                    </span>
+                </div>
 
                 <!-- FORM PENCARIAN NAMA -->
                 <form action="{{ url('/dashboard') }}" method="GET" class="mb-6 flex gap-2">
-                    <input type="text" name="search" value="{{ request('search') }}" 
-                           placeholder="Ketik nama kamu di sini (contoh: yaya)..." 
-                           class="w-full border-gray-300 focus:border-amber-500 focus:ring-amber-500 rounded-md shadow-sm text-sm">
-                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-5 py-2 rounded-md text-sm transition">
-                        🔍 Cari
+                    <div class="relative w-full">
+                        <input type="text" name="search" value="{{ request('search') }}" 
+                               placeholder="Ketik nama kamu di sini (contoh: yaya)..." 
+                               class="w-full border-slate-300 focus:border-amber-500 focus:ring-amber-500 rounded-xl shadow-sm text-sm pl-4 pr-10 py-2.5 bg-white">
+                    </div>
+                    <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition shadow-sm flex items-center gap-1">
+                        <span>🔍</span> Cari
                     </button>
                     @if(request('search'))
-                        <a href="{{ url('/dashboard') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-4 py-2 rounded-md text-sm flex items-center">
+                        <a href="{{ url('/dashboard') }}" class="bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold px-4 py-2.5 rounded-xl text-sm flex items-center transition">
                             Reset
                         </a>
                     @endif
                 </form>
                 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-gray-500">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                    <table class="w-full text-sm text-left text-slate-600">
+                        <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b border-slate-200">
                             <tr>
-                                <th class="px-4 py-3">Nama Pemesan</th>
-                                <th class="px-4 py-3">Detail Pesanan</th>
-                                <th class="px-4 py-3">Urgensi</th>
-                                <th class="px-4 py-3">Lama Pengerjaan</th>
-                                <th class="px-4 py-3">Status Pesanan</th>
+                                <th class="px-4 py-3.5">Nama Pemesan</th>
+                                <th class="px-4 py-3.5">Detail Pesanan</th>
+                                <th class="px-4 py-3.5">Urgensi</th>
+                                <th class="px-4 py-3.5">Lama Pengerjaan</th>
+                                <th class="px-4 py-3.5">Status Pesanan</th>
+                                <th class="px-4 py-3.5 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-slate-200 bg-white">
                             @php
-                                // Tarik semua pesanan urut terbaru
-                                $allOrders = \App\Models\Order::with('user')->latest()->get();
+                                $query = \App\Models\Order::query();
 
-                                // Filter pencarian aman tanpa dependensi nama kolom SQL
                                 if (request('search')) {
-                                    $searchKey = strtolower(request('search'));
-                                    $orders = $allOrders->filter(function($item) use ($searchKey) {
-                                        $strData = strtolower(json_encode($item->toArray()));
-                                        $userName = strtolower($item->user->name ?? '');
-                                        return str_contains($strData, $searchKey) || str_contains($userName, $searchKey);
-                                    });
-                                } else {
-                                    $orders = $allOrders;
+                                    $searchKey = request('search');
+                                    $query->where('customer_name', 'like', '%' . $searchKey . '%');
                                 }
+
+                                $orders = $query->orderBy('priority_score', 'desc')
+                                               ->orderBy('created_at', 'asc')
+                                               ->get();
                             @endphp
 
                             @forelse($orders as $order)
-                                @php
-                                    $a = $order->toArray();
-
-                                    // 1. Nama Pemesan
-                                    $nama = $order->user->name ?? $a['nama_pemesan'] ?? $a['nama'] ?? 'Pelanggan';
-
-                                    // 2. Detail Pesanan
-                                    $detail = '-';
-                                    if (!empty($a['detail_cetak'])) {
-                                        $detail = $a['detail_cetak'];
-                                    } elseif (!empty($a['jumlah_halaman'])) {
-                                        $jilid = $a['jenis_jilid'] ?? $a['jilid'] ?? 'tanpa jilid';
-                                        $detail = $a['jumlah_halaman'] . ' Halaman (' . $jilid . ')';
-                                    } elseif (!empty($a['detail_pesanan'])) {
-                                        $detail = $a['detail_pesanan'];
-                                    }
-
-                                    // 3. Urgensi
-                                    $urgensi = $a['tingkat_ketergesaan'] ?? $a['urgensi'] ?? 'Biasa';
-
-                                    // 4. Lama Pengerjaan
-                                    $lama = $a['lama_pengerjaan'] ?? $a['estimasi_waktu'] ?? '-';
-                                    if (is_numeric($lama)) {
-                                        $lama = $lama . ' Menit';
-                                    }
-
-                                    // 5. Status
-                                    $statusRaw = strtolower($a['status'] ?? '');
-                                @endphp
-
-                                <tr class="border-b bg-white hover:bg-gray-50">
-                                    <!-- Nama Pemesan -->
-                                    <td class="px-4 py-3 font-bold text-gray-900">
-                                        👤 {{ $nama }}
+                                <tr class="hover:bg-amber-50/50 transition">
+                                    <td class="px-4 py-4 font-bold text-slate-900">
+                                        👤 {{ $order->customer_name }}
                                     </td>
-
-                                    <!-- Detail Pesanan -->
-                                    <td class="px-4 py-3 font-medium text-gray-800">
-                                        {{ $detail }}
+                                    <td class="px-4 py-4 font-medium text-slate-800">
+                                        📄 {{ $order->total_pages }} Hal 
+                                        <span class="text-slate-500">({{ ucfirst($order->binding_type) }})</span>
+                                        @if(($order->copies ?? 1) > 1)
+                                            <span class="ml-1 px-2 py-0.5 text-xs font-bold rounded bg-amber-100 text-amber-800 border border-amber-200">
+                                                {{ $order->copies }}x Copy
+                                            </span>
+                                        @endif
                                     </td>
-
-                                    <!-- Urgensi -->
-                                    <td class="px-4 py-3">
-                                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                            {{ $urgensi }}
-                                        </span>
+                                    <td class="px-4 py-4">
+                                        @if(($order->urgency_level ?? 0) >= 8)
+                                            <span class="px-3 py-1 text-xs font-extrabold rounded-full bg-red-100 text-red-700 border border-red-200 inline-block">
+                                                🔥 Sangat Urgent ({{ $order->urgency_level }}/10)
+                                            </span>
+                                        @elseif(($order->urgency_level ?? 0) >= 5)
+                                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-amber-100 text-amber-800 border border-amber-200 inline-block">
+                                                ⚡ Urgent ({{ $order->urgency_level }}/10)
+                                            </span>
+                                        @else
+                                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-slate-100 text-slate-600 border border-slate-200 inline-block">
+                                                ☕ Biasa ({{ $order->urgency_level ?? 1 }}/10)
+                                            </span>
+                                        @endif
                                     </td>
-
-                                    <!-- Lama Pengerjaan -->
-                                    <td class="px-4 py-3 font-medium text-gray-700">
-                                        ⏱️ {{ $lama }}
+                                    <td class="px-4 py-4 font-semibold text-slate-700">
+                                        ⏱️ {{ $order->estimated_duration_minutes ?? 0 }} Menit
                                     </td>
-
-                                    <!-- Status Pesanan -->
-                                    <td class="px-4 py-3">
-                                        @if($statusRaw === 'selesai')
-                                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-green-100 text-green-800">
+                                    <td class="px-4 py-4">
+                                        @if($order->status === 'Selesai')
+                                            <span class="px-3 py-1 text-xs font-extrabold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 inline-block">
                                                 ✅ Selesai (Bisa Diambil)
                                             </span>
-                                        @elseif($statusRaw === 'diproses' || str_contains($statusRaw, 'proses'))
-                                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-800">
+                                        @elseif($order->status === 'Diproses')
+                                            <span class="px-3 py-1 text-xs font-extrabold rounded-full bg-blue-100 text-blue-800 border border-blue-200 inline-block">
                                                 ⚙️ Sedang Dikerjakan
                                             </span>
                                         @else
-                                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-yellow-100 text-yellow-800">
+                                            <span class="px-3 py-1 text-xs font-extrabold rounded-full bg-amber-100 text-amber-800 border border-amber-200 inline-block">
                                                 ⏳ Dalam Antrean AI
                                             </span>
                                         @endif
                                     </td>
+                                    <td class="px-4 py-4 text-center">
+                                        <a href="{{ route('order.status', $order->id) }}" 
+                                           class="inline-flex items-center gap-1 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg shadow-sm transition">
+                                            👁️ Cek Jam & Nota
+                                        </a>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-4 py-6 text-center text-gray-400">
-                                        Data pesanan tidak ditemukan.
+                                    <td colspan="6" class="px-4 py-8 text-center text-slate-400 font-medium">
+                                        🚫 Data pesanan belum ada atau tidak ditemukan.
                                     </td>
                                 </tr>
                             @endforelse

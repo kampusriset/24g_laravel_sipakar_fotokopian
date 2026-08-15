@@ -3,174 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadwal Prioritas Pengerjaan - Admin</title>
+    <title>Jadwal Prioritas Pengerjaan - Admin Panel</title>
+    <!-- Bootstrap 5 CSS & Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        /* Modern Dark Command Center Theme */
+        body {
+            background: #0f172a !important;
+            min-height: 100vh;
+            color: #f8fafc !important;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
 
-    <!-- Header / Navbar Status Login & Logout -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 px-4 shadow-sm">
+        /* Glassmorphism Card Effect */
+        .glass-card {
+            background: #1e293b !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .stat-card {
+            background: #1e293b !important;
+            border-radius: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Badge Custom Warna Jelas & Terang */
+        .badge-urgent-danger {
+            background-color: #ef4444 !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+        }
+
+        .badge-urgent-warning {
+            background-color: #f59e0b !important;
+            color: #000000 !important;
+            font-weight: 700 !important;
+        }
+
+        .badge-urgent-secondary {
+            background-color: #475569 !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        .badge-info-blue {
+            background-color: #0284c7 !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+        }
+
+        .badge-rank-1 {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+        }
+
+        /* Form Select Custom Dark */
+        .form-select-dark {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            border: 1px solid #475569 !important;
+            font-size: 0.8rem !important;
+            padding: 6px 28px 6px 10px !important;
+            width: 100% !important;
+            min-width: 140px !important;
+        }
+        .form-select-dark:focus {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 0.25rem rgba(245, 158, 11, 0.25) !important;
+        }
+    </style>
+</head>
+<body class="pb-5">
+
+    <!-- Header / Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark border-bottom border-secondary border-opacity-25 mb-4 px-4 shadow-lg sticky-top" style="background-color: #0f172a;">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold text-warning" href="<?php echo e(route('admin.dashboard')); ?>">⚡ Admin Panel Fotokopi</a>
+            <a class="navbar-brand fw-bold text-warning d-flex align-items-center gap-2" href="<?php echo e(route('admin.dashboard')); ?>">
+                <span class="fs-4">⚡</span> 
+                <span>PUNAZA COPY - Admin Panel</span>
+            </a>
             
             <div class="d-flex align-items-center gap-3 text-white">
-                <a href="<?php echo e(route('dashboard')); ?>" class="btn btn-outline-warning btn-sm">🏠 Mode Pelanggan</a>
-                <span class="small">Halo, <strong><?php echo e(Auth::user()->name ?? 'Admin'); ?></strong></span>
+                <a href="<?php echo e(route('dashboard')); ?>" class="btn btn-outline-warning btn-sm rounded-pill fw-bold">
+                    <i class="bi bi-house me-1"></i> Mode Pelanggan
+                </a>
+                
+                <span class="small border-start border-secondary ps-3 ms-1 border-opacity-50 text-slate-300">
+                    Halo, <strong class="text-white"><?php echo e(Auth::user()->name ?? 'Admin Percetakan'); ?></strong>
+                </span>
+
                 <form method="POST" action="<?php echo e(route('logout')); ?>" class="m-0">
                     <?php echo csrf_field(); ?>
-                    <button type="submit" class="btn btn-outline-light btn-sm">Log Out</button>
+                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
                 </form>
             </div>
         </div>
     </nav>
 
-    <div class="container pb-5">
+    <div class="container-fluid px-4 pb-5">
         
         <!-- CARD RINGKASAN STATISTIK DASHBOARD -->
         <div class="row g-3 mb-4">
             <div class="col-md-4">
-                <div class="card shadow-sm border-0 border-start border-primary border-4 p-3 bg-white">
+                <div class="card stat-card border-0 border-start border-primary border-4 p-3 glass-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-muted fw-bold text-uppercase small">Total Pesanan</span>
-                            <h3 class="fw-bold mb-0 text-dark"><?php echo e(count($orders)); ?></h3>
+                            <span class="text-secondary fw-bold text-uppercase small">Total Pesanan</span>
+                            <h2 class="fw-bold mb-0 text-white display-6"><?php echo e(count($orders)); ?></h2>
                         </div>
-                        <div class="fs-1">📦</div>
+                        <div class="fs-1 bg-primary bg-opacity-20 p-2 rounded-3">📦</div>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="card shadow-sm border-0 border-start border-warning border-4 p-3 bg-white">
+                <div class="card stat-card border-0 border-start border-warning border-4 p-3 glass-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-muted fw-bold text-uppercase small">Perlu Diproses</span>
-                            <h3 class="fw-bold mb-0 text-warning">
-                                <?php echo e($orders->whereIn('status', ['Dalam Antrean AI', 'Dalam Antrean'])->count()); ?>
+                            <span class="text-warning fw-bold text-uppercase small">Perlu Diproses</span>
+                            <h2 class="fw-bold mb-0 text-warning display-6">
+                                <?php echo e($orders->whereIn('status', ['Dalam Antrean AI', 'Dalam Antrean', 'Diproses'])->count()); ?>
 
-                            </h3>
+                            </h2>
                         </div>
-                        <div class="fs-1">⏳</div>
+                        <div class="fs-1 bg-warning bg-opacity-20 p-2 rounded-3">⏳</div>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="card shadow-sm border-0 border-start border-success border-4 p-3 bg-white">
+                <div class="card stat-card border-0 border-start border-success border-4 p-3 glass-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-muted fw-bold text-uppercase small">Pesanan Selesai</span>
-                            <h3 class="fw-bold mb-0 text-success">
+                            <span class="text-success fw-bold text-uppercase small">Pesanan Selesai</span>
+                            <h2 class="fw-bold mb-0 text-success display-6">
                                 <?php echo e($orders->where('status', 'Selesai')->count()); ?>
 
-                            </h3>
+                            </h2>
                         </div>
-                        <div class="fs-1">✅</div>
+                        <div class="fs-1 bg-success bg-opacity-20 p-2 rounded-3">✅</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <h2 class="mb-4 fw-bold">Jadwal Prioritas Pengerjaan</h2>
-        
         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
-            <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-                <?php echo e(session('success')); ?>
+            <div class="alert alert-success alert-dismissible fade show mb-4 rounded-3 text-white" style="background-color: #059669;" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> <?php echo e(session('success')); ?>
 
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-        <!-- Area Tombol Aksi (Tambah, Export Excel & Export PDF) -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <a href="<?php echo e(route('order.form')); ?>" class="btn btn-primary fw-semibold">+ Tambah Pesanan Baru</a>
-            <div class="d-flex gap-2">
-                <a href="<?php echo e(route('admin.exportExcel')); ?>" class="btn btn-success fw-semibold">📥 Export Excel</a>
-                <a href="<?php echo e(route('admin.exportPdf')); ?>" target="_blank" class="btn btn-danger fw-semibold">📄 Export PDF</a>
+        <!-- TABEL UTAMA WORKLIST -->
+        <div class="glass-card p-4">
+            
+            <!-- Header & Tombol Aksi -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3 border-bottom border-secondary border-opacity-25 pb-3">
+                <div>
+                    <h3 class="fw-bold mb-1 text-white">⚙️ Jadwal Prioritas Pengerjaan</h3>
+                    <p class="text-secondary small mb-0">Urutan antrean diurutkan otomatis oleh <strong class="text-warning">Sistem Pakar Fuzzy Logic + FIFO</strong>.</p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="<?php echo e(route('order.form')); ?>" class="btn btn-primary btn-sm fw-bold px-3 py-2 rounded-3">
+                        <i class="bi bi-plus-circle me-1"></i> Tambah Pesanan
+                    </a>
+                    <a href="<?php echo e(route('admin.exportExcel')); ?>" class="btn btn-success btn-sm fw-bold px-3 py-2 rounded-3">
+                        <i class="bi bi-file-earmark-excel me-1"></i> Export Excel
+                    </a>
+                    <a href="<?php echo e(route('admin.exportPdf')); ?>" target="_blank" class="btn btn-danger btn-sm fw-bold px-3 py-2 rounded-3">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
+                    </a>
+                </div>
             </div>
-        </div>
-        
-        <div class="table-responsive bg-white shadow-sm rounded">
-            <table class="table table-bordered align-middle text-center mb-0">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Urutan AI</th>
-                        <th>Nama Pemesan</th>
-                        <th>Detail Pesanan</th>
-                        <th>Tingkat Ketergesaan</th>
-                        <th>Lama Pengerjaan</th>
-                        <th>Nilai Prioritas</th>
-                        <th>Status Pesanan</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-                    <tr>
-                        <td><span class="badge bg-danger fs-6">#<?php echo e($index + 1); ?></span></td>
-                        <td class="text-start ps-3 fw-semibold"><?php echo e($order->customer_name); ?></td>
-                        <td class="text-start ps-3"><?php echo e($order->total_pages); ?> hlm (<?php echo e($order->binding_type); ?>)</td>
-                        
-                        <td>
-                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->urgency_level >= 6): ?>
-                                <span class="badge bg-danger">Sangat Urgent</span>
-                            <?php elseif($order->urgency_level >= 3): ?>
-                                <span class="badge bg-warning text-dark">Penting</span>
-                            <?php else: ?>
-                                <span class="badge bg-secondary">Biasa</span>
-                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                        </td>
 
-                        <td>
-                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->estimated_duration_minutes <= 15): ?>
-                                <span class="badge bg-info text-dark">Cepat (<?php echo e($order->estimated_duration_minutes); ?> Mnt)</span>
-                            <?php elseif($order->estimated_duration_minutes <= 45): ?>
-                                <span class="badge bg-primary">Sedang (<?php echo e($order->estimated_duration_minutes); ?> Mnt)</span>
-                            <?php else: ?>
-                                <span class="badge bg-dark">Lama (<?php echo e($order->estimated_duration_minutes); ?> Mnt)</span>
-                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                        </td>
+            <!-- Table Responsive -->
+            <div class="table-responsive rounded-3 border border-secondary border-opacity-25">
+                <table class="table table-dark align-middle text-center mb-0">
+                    <thead class="table-dark text-uppercase small text-secondary">
+                        <tr>
+                            <th class="py-3">Urutan AI</th>
+                            <th class="py-3 text-start ps-3">Nama Pemesan</th>
+                            <th class="py-3 text-start ps-3">Detail Pesanan</th>
+                            <th class="py-3">Tingkat Ketergesaan</th>
+                            <th class="py-3">Lama Pengerjaan</th>
+                            <th class="py-3">Nilai Prioritas AI</th>
+                            <th class="py-3">Status Pesanan</th>
+                            <th class="py-3">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                        <tr class="border-bottom border-secondary border-opacity-25">
+                            
+                            <!-- Urutan AI -->
+                            <td>
+                                <span class="badge <?php echo e($index == 0 ? 'badge-rank-1' : 'bg-secondary'); ?> fs-6 px-3 py-1.5 rounded-pill">
+                                    #<?php echo e($index + 1); ?>
 
-                        <td>
-                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->priority_score >= 60): ?>
-                                <span class="badge bg-secondary fs-6">Tinggi (<?php echo e($order->priority_score); ?>)</span>
-                            <?php elseif($order->priority_score >= 30): ?>
-                                <span class="badge bg-secondary fs-6">Sedang (<?php echo e($order->priority_score); ?>)</span>
-                            <?php else: ?>
-                                <span class="badge bg-secondary fs-6">Rendah (<?php echo e($order->priority_score); ?>)</span>
-                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                        </td>
+                                </span>
+                            </td>
 
-                        <td style="width: 160px;">
-                            <form action="<?php echo e(route('admin.updateStatus', $order->id)); ?>" method="POST">
-                                <?php echo csrf_field(); ?>
-                                <?php echo method_field('PATCH'); ?>
-                                <select name="status" onchange="this.form.submit()" class="form-select form-select-sm fw-semibold">
-                                    <option value="Dalam Antrean AI" <?php echo e($order->status == 'Dalam Antrean AI' ? 'selected' : ''); ?>>Dalam Antrean AI</option>
-                                    <option value="Diproses" <?php echo e($order->status == 'Diproses' ? 'selected' : ''); ?>>Diproses</option>
-                                    <option value="Selesai" <?php echo e($order->status == 'Selesai' ? 'selected' : ''); ?>>Selesai</option>
-                                </select>
-                            </form>
-                        </td>
+                            <!-- Nama Pemesan -->
+                            <td class="text-start ps-3 fw-bold text-white">
+                                👤 <?php echo e($order->customer_name); ?>
 
-                        <td>
-                            <form action="<?php echo e(route('admin.deleteOrder', $order->id)); ?>" method="POST" onsubmit="return confirm('Yakin ingin menghapus pesanan <?php echo e($order->customer_name); ?>?')">
-                                <?php echo csrf_field(); ?>
-                                <?php echo method_field('DELETE'); ?>
-                                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
-                    <tr>
-                        <td colspan="8" class="text-muted py-4">Belum ada pesanan masuk.</td>
-                    </tr>
-                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                </tbody>
-            </table>
+                            </td>
+
+                            <!-- Detail Pesanan -->
+                            <td class="text-start ps-3">
+                                <span class="fw-semibold text-white"><?php echo e($order->total_pages); ?> hlm</span> 
+                                <span class="text-secondary">(<?php echo e($order->binding_type); ?>)</span>
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(($order->copies ?? 1) > 1): ?>
+                                    <span class="badge bg-info text-dark ms-1">
+                                        <?php echo e($order->copies); ?>x Copy
+                                    </span>
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            </td>
+                            
+                            <!-- Ketergesaan -->
+                            <td>
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->urgency_level >= 8): ?>
+                                    <span class="badge badge-urgent-danger px-3 py-1.5 rounded-pill">Sangat Urgent (<?php echo e($order->urgency_level); ?>/10)</span>
+                                <?php elseif($order->urgency_level >= 4): ?>
+                                    <span class="badge badge-urgent-warning px-3 py-1.5 rounded-pill">Penting (<?php echo e($order->urgency_level); ?>/10)</span>
+                                <?php else: ?>
+                                    <span class="badge badge-urgent-secondary px-3 py-1.5 rounded-pill">Biasa (<?php echo e($order->urgency_level); ?>/10)</span>
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            </td>
+
+                            <!-- Lama Pengerjaan -->
+                            <td>
+                                <span class="badge badge-info-blue px-3 py-1.5 rounded-pill">
+                                    ⏱️ <?php echo e($order->estimated_duration_minutes); ?> Mnt
+                                </span>
+                            </td>
+
+                            <!-- Nilai Prioritas -->
+                            <td>
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->priority_score >= 70): ?>
+                                    <span class="badge badge-urgent-danger px-3 py-1.5 rounded-pill">Tinggi (<?php echo e($order->priority_score); ?>)</span>
+                                <?php elseif($order->priority_score >= 45): ?>
+                                    <span class="badge badge-urgent-warning px-3 py-1.5 rounded-pill">Sedang (<?php echo e($order->priority_score); ?>)</span>
+                                <?php else: ?>
+                                    <span class="badge badge-urgent-secondary px-3 py-1.5 rounded-pill">Rendah (<?php echo e($order->priority_score); ?>)</span>
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            </td>
+
+                            <!-- Select Update Status -->
+                            <td style="min-width: 160px;">
+                                <form action="<?php echo e(route('admin.updateStatus', $order->id)); ?>" method="POST" class="m-0">
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('PATCH'); ?>
+                                    <select name="status" onchange="this.form.submit()" class="form-select form-select-dark rounded-3 fw-semibold text-center">
+                                        <option value="Dalam Antrean AI" <?php echo e($order->status == 'Dalam Antrean AI' ? 'selected' : ''); ?>>Dalam Antrean AI</option>
+                                        <option value="Diproses" <?php echo e($order->status == 'Diproses' ? 'selected' : ''); ?>>Diproses</option>
+                                        <option value="Selesai" <?php echo e($order->status == 'Selesai' ? 'selected' : ''); ?>>Selesai</option>
+                                    </select>
+                                </form>
+                            </td>
+
+                            <!-- Tombol Hapus -->
+                            <td>
+                                <form action="<?php echo e(route('admin.deleteOrder', $order->id)); ?>" method="POST" class="m-0" onsubmit="return confirm('Yakin ingin menghapus pesanan <?php echo e($order->customer_name); ?>?')">
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('DELETE'); ?>
+                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-2 px-2.5 py-1">
+                                        <i class="bi bi-trash"></i> Hapus
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                        <tr>
+                            <td colspan="8" class="text-secondary py-5">
+                                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                Belum ada pesanan masuk.
+                            </td>
+                        </tr>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 
+    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html><?php /**PATH C:\laragon\www\fotokopi111\resources\views/admin.blade.php ENDPATH**/ ?>
